@@ -1,18 +1,82 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="Experiencia privada y romántica — sobre interactivo y universo 3D." />
-    <meta name="theme-color" content="#0b1220" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <title>Nuestra Historia — Love</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <noscript>Necesitas habilitar JavaScript para ver esta aplicación.</noscript>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nuestra Historia — Carta</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main id="app">
+    <!-- LETTER SCREEN -->
+    <section id="letter-screen" class="screen">
+      <div class="card">
+        <h1>Juntos desde el 15 de julio de 2026</h1>
+        <p class="muted">Días: <strong id="days-counter">0</strong></p>
+
+        <div class="letter">
+          <p>Querida persona,</p>
+          <p>Esta es una carta íntima. Pulsa abrir para ver una pequeña sorpresa.</p>
+        </div>
+
+        <div class="actions">
+          <button id="open-btn" class="btn primary">Abrir carta</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPACE SCREEN -->
+    <section id="space-screen" class="screen hidden" aria-hidden="true">
+      <header class="topbar">
+        <button id="back-btn" class="btn">Volver</button>
+        <h2>Nuestro Universo</h2>
+        <div></div>
+      </header>
+
+      <div class="content">
+        <div class="canvas" id="planet-area" tabindex="0">
+          <div id="planet" class="planet">
+            <!-- markers, stars and plane will be injected here -->
+            <svg id="route-svg" class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div id="plane" class="plane hidden" aria-hidden="true" title="Avión" ></div>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="panel">
+            <button id="toggle-route" class="btn primary">Mostrar ruta</button>
+            <div id="route-card" class="route-card hidden">
+              <div class="small" id="origin-label"></div>
+              <div class="dist" id="distance-label"></div>
+              <div class="small" id="dest-label"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Recuerdos</h3>
+            <ul id="rec-list" class="rec-list"></ul>
+          </div>
+
+          <div class="panel">
+            <h3>Audio</h3>
+            <p class="small">Agrega /audio/entre-el-juego-y-la-vida.mp3 en la carpeta raíz para sonido.</p>
+            <div class="small">Se desvanecerá al activar/desactivar la ruta.</div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- modal for star messages -->
+      <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+          <div id="modal-text"></div>
+          <div class="modal-actions"><button id="modal-close" class="btn">Cerrar</button></div>
+        </div>
+      </div>
+
+      <audio id="bg-audio" src="/audio/entre-el-juego-y-la-vida.mp3" loop preload="auto"></audio>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
 </html>
