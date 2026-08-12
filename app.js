@@ -1,8 +1,8 @@
 // Basic vanilla JS app for Carta (no frameworks)
 (function(){
   // Config
-  const origin = { city: 'Esmeraldas', country: 'Ecuador' }
-  const destination = { city: 'Acapulco', country: 'México' }
+  const origin = { city: 'Esmeraldas', country: 'Ecuador', latitude: 0.965, longitude: -79.621 }
+  const destination = { city: 'Acapulco', country: 'México', latitude: 16.8531, longitude: -99.8237 }
   const loveMessages = [
     'Recuerdo 1: Cuando reímos juntos en la lluvia.',
     'Recuerdo 2: Aquella canción que no podíamos dejar de tararear.',
@@ -13,6 +13,10 @@
     'Recuerdo 7: La promesa de volver a viajar juntos.',
     'Recuerdo 8: Esa mirada que lo decía todo.'
   ]
+
+  // Configuration: number of stars and how many are interactive
+  const STARS_COUNT = 100
+  const INTERACTIVE_COUNT = Math.min(16, Math.floor(STARS_COUNT / 6)) // a subset
 
   // Elements
   const letterScreen = document.getElementById('letter-screen')
@@ -38,6 +42,7 @@
   let showRoute = false
   let viewed = JSON.parse(localStorage.getItem('viewed_stars')||'[]')
   let stars = []
+  let interactiveIndices = []
   let planeRAF = null
 
   // Helper: days since
@@ -49,10 +54,17 @@
     daysCounter.textContent = String(days)
   }
 
-  // Helper: distance (simple placeholder km)
-  function calculateDistance(){
-    // simplified fixed value from previous implementation
-    return 4660 // placeholder
+  // Helper: distance using Haversine formula
+  function calculateDistanceKm(a, b){
+    const R = 6371 // km
+    const toRad = v => (v * Math.PI) / 180
+    const dLat = toRad(b.latitude - a.latitude)
+    const dLon = toRad(b.longitude - a.longitude)
+    const lat1 = toRad(a.latitude)
+    const lat2 = toRad(b.latitude)
+    const aa = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)*Math.sin(dLon/2)
+    const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1-aa))
+    return R * c
   }
 
   // Init rec list
@@ -88,11 +100,19 @@
 
   // Stars
   function generateStars(){
-    stars = Array.from({length:40}).map((_,i)=>({
+    // pick interactive indices evenly distributed
+    interactiveIndices = []
+    const step = Math.floor(STARS_COUNT / INTERACTIVE_COUNT) || 1
+    for(let i=0;i<INTERACTIVE_COUNT;i++){
+      const base = i*step
+      interactiveIndices.push(Math.min(STARS_COUNT-1, base + Math.floor(Math.random()*Math.max(1,step-1))))
+    }
+
+    stars = Array.from({length:STARS_COUNT}).map((_,i)=>({
       id:i,
       x: Math.random()*92 + 4, // padding
       y: Math.random()*84 + 6,
-      interactive: i < 8
+      interactive: interactiveIndices.includes(i)
     }))
   }
 
@@ -213,7 +233,8 @@
     generateStars(); renderStars(); renderMarkers()
     originLabel.textContent = origin.city + ', ' + origin.country
     destLabel.textContent = destination.city + ', ' + destination.country
-    distanceLabel.textContent = calculateDistance() + ' km'
+    const distKm = Math.round(calculateDistanceKm(origin, destination))
+    distanceLabel.textContent = distKm + ' km'
 
     openBtn.addEventListener('click', ()=>{
       letterScreen.classList.add('hidden')
